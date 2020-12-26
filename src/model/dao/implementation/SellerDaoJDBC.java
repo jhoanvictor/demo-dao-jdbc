@@ -87,7 +87,24 @@ public class SellerDaoJDBC implements SellerDao {
 
 	@Override
 	public void delete(Integer id) {
-		// TODO Auto-generated method stub
+
+		PreparedStatement st = null;
+
+		try {
+			st = conn.prepareStatement("DELETE FROM seller WHERE Id = ? ");
+			st.setInt(1, id);
+			
+			int rowsAffected = st.executeUpdate();
+			
+			if(rowsAffected == 0) {
+				throw new DbException("Seller not found!");
+			}
+			
+		} catch (SQLException e) {
+			throw new DbException(e.getMessage());
+		} finally {
+			DB.closeStatement(st);
+		}
 
 	}
 
@@ -162,24 +179,6 @@ public class SellerDaoJDBC implements SellerDao {
 		}
 	}
 
-	private Seller instantiateSeller(ResultSet rs, Department dep) throws SQLException {
-		Seller seller = new Seller();
-		seller.setId(rs.getInt("Id"));
-		seller.setName(rs.getString("Name"));
-		seller.setEmail(rs.getString("Email"));
-		seller.setBirthDate(rs.getDate("BirthDate"));
-		seller.setBaseSalary(rs.getDouble("BaseSalary"));
-		seller.setDepartment(dep);
-		return seller;
-	}
-
-	private Department instantiateDepartment(ResultSet rs) throws SQLException {
-		Department dep = new Department();
-		dep.setId(rs.getInt("DepartmentId"));
-		dep.setName(rs.getString("DepName"));
-		return dep;
-	}
-
 	@Override
 	public List<Seller> findByDepartment(Department department) {
 
@@ -221,5 +220,25 @@ public class SellerDaoJDBC implements SellerDao {
 			DB.closeStatement(st);
 		}
 	}
+
+	private Seller instantiateSeller(ResultSet rs, Department dep) throws SQLException {
+		Seller seller = new Seller();
+		seller.setId(rs.getInt("Id"));
+		seller.setName(rs.getString("Name"));
+		seller.setEmail(rs.getString("Email"));
+		seller.setBirthDate(rs.getDate("BirthDate"));
+		seller.setBaseSalary(rs.getDouble("BaseSalary"));
+		seller.setDepartment(dep);
+		return seller;
+	}
+
+	private Department instantiateDepartment(ResultSet rs) throws SQLException {
+		Department dep = new Department();
+		dep.setId(rs.getInt("DepartmentId"));
+		dep.setName(rs.getString("DepName"));
+		return dep;
+	}
+
+	
 
 }
